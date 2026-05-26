@@ -1,0 +1,229 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-mint: var(--mint);
+  --color-sky: var(--sky);
+  --color-brand: var(--brand);
+  --color-brand-dark: var(--brand-dark);
+  --color-brand-light: var(--brand-light);
+  --color-cream: var(--cream);
+  --color-cream-light: var(--cream-light);
+  --color-cream-muted: var(--cream-muted);
+  --color-warm: var(--warm);
+  --color-warm-muted: var(--warm-muted);
+  --color-accent: var(--accent-yellow);
+  --color-accent-light: var(--accent-yellow-light);
+  --color-footer: var(--footer);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+}
+
+:root {
+  /* あさの歯科 カラーパレット — ロゴに合わせた優しい色味
+   * Cream: #FEF9E7 — 温かみのある背景
+   * Leaf Green: #66BB6A — ロゴのやさしいグリーン
+   * Warm Yellow: #FFD54F — ロゴのライオン・ハイライト
+   */
+  --radius: 0.75rem;
+  --cream: #FEF9E7;
+  --cream-light: #FFFDF5;
+  --cream-muted: #F5EDD4;
+  --brand: #66BB6A;
+  --brand-dark: #4CAF50;
+  --brand-light: #A5D6A7;
+  --accent-yellow: #FFD54F;
+  --accent-yellow-light: #FFF8E1;
+  --warm: #5C5748;
+  --warm-muted: #8A8575;
+  --footer: #4A7A4E;
+  --background: #FEF9E7;
+  --foreground: #5C5748;
+  --card: #FFFCF5;
+  --card-foreground: #5C5748;
+  --popover: #FFFCF5;
+  --popover-foreground: #5C5748;
+  --primary: #66BB6A;
+  --primary-foreground: #FFFFFF;
+  --secondary: #FFD54F;
+  --secondary-foreground: #5C5748;
+  --muted: #F5EDD4;
+  --muted-foreground: #8A8575;
+  --accent: #FFD54F;
+  --accent-foreground: #5C5748;
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.985 0 0);
+  --border: #EDE4C8;
+  --input: #EDE4C8;
+  --ring: #66BB6A;
+  --mint: #66BB6A;
+  --sky: #FFD54F;
+  --chart-1: #66BB6A;
+  --chart-2: #FFD54F;
+  --chart-3: #4CAF50;
+  --chart-4: #A5D6A7;
+  --chart-5: #FFF8E1;
+  /* 固定ヘッダー高さ（モバイルはノッチ下＋余白込み） */
+  --header-safe-top: env(safe-area-inset-top, 0px);
+  --header-mobile-extra: 0.875rem;
+  --header-mobile-bar: 3.75rem;
+  --header-offset-mobile: calc(
+    var(--header-safe-top) + var(--header-mobile-extra) + var(--header-mobile-bar)
+  );
+  --header-offset-desktop: 5rem;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Noto Sans JP', sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3, h4 {
+    font-family: 'Noto Serif JP', serif;
+  }
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  [type="button"]:not(:disabled),
+  [type="submit"]:not(:disabled),
+  [type="reset"]:not(:disabled),
+  a[href],
+  select:not(:disabled),
+  input[type="checkbox"]:not(:disabled),
+  input[type="radio"]:not(:disabled) {
+    @apply cursor-pointer;
+  }
+}
+
+@layer components {
+  .container {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .flex {
+    min-height: 0;
+    min-width: 0;
+  }
+
+  @media (min-width: 640px) {
+    .container {
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .container {
+      padding-left: 2rem;
+      padding-right: 2rem;
+      max-width: 1200px;
+    }
+  }
+
+  /* Fade-in animation for scroll reveal */
+  .fade-in-up {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.5s cubic-bezier(0.23, 1, 0.32, 1), transform 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+  }
+
+  /* Card hover effect */
+  .card-hover {
+    transition: transform 0.2s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.2s cubic-bezier(0.23, 1, 0.32, 1);
+  }
+  .card-hover:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(102, 187, 106, 0.18);
+  }
+
+  /* Button press effect */
+  .btn-press:active {
+    transform: scale(0.97);
+    transition: transform 0.1s ease-out;
+  }
+
+  /* モバイル固定ヘッダー（ノッチ下にロゴ・タイトルを配置） */
+  .site-header {
+    padding-top: calc(var(--header-safe-top) + var(--header-mobile-extra));
+    padding-left: max(1rem, env(safe-area-inset-left, 0px));
+    padding-right: max(1rem, env(safe-area-inset-right, 0px));
+  }
+
+  @media (min-width: 768px) {
+    .site-header {
+      padding-top: 0;
+      padding-left: 0;
+      padding-right: 0;
+    }
+  }
+
+  /* スマホ：一般的なコーポレートサイト並みのコンパクト表示 */
+  @media (max-width: 767px) {
+    html {
+      font-size: 15px;
+    }
+
+    body {
+      line-height: 1.55;
+    }
+
+    .compact-mobile .leading-relaxed {
+      line-height: 1.55;
+    }
+  }
+}
+
+/* Stagger animation delays */
+.stagger-1 { transition-delay: 0ms; }
+.stagger-2 { transition-delay: 80ms; }
+.stagger-3 { transition-delay: 160ms; }
+.stagger-4 { transition-delay: 240ms; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .fade-in-up.animate {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  .fade-in-up.animate.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

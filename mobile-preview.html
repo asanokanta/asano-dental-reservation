@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>スマホプレビュー — あさの歯科</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 0.75rem;
+        background: #1e293b;
+        font-family: system-ui, -apple-system, sans-serif;
+        padding: 1rem 1rem 1.5rem;
+      }
+      h1 {
+        color: #f8fafc;
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin: 0;
+      }
+      .panel {
+        width: 100%;
+        max-width: 36rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.65rem;
+      }
+      .label {
+        color: #94a3b8;
+        font-size: 0.7rem;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+      .toolbar {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+      }
+      .toolbar button {
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 0.5rem;
+        background: #334155;
+        color: #f8fafc;
+        cursor: pointer;
+        font-size: 0.85rem;
+      }
+      .toolbar button:hover {
+        background: #475569;
+      }
+      .toolbar button.active {
+        background: #0d9488;
+      }
+      .toolbar button.admin.active {
+        background: #1e40af;
+      }
+      .device-controls {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+      .device-select {
+        width: 100%;
+        padding: 0.55rem 0.75rem;
+        border-radius: 0.5rem;
+        border: 1px solid #475569;
+        background: #0f172a;
+        color: #f8fafc;
+        font-size: 0.9rem;
+        cursor: pointer;
+      }
+      .device-select:focus {
+        outline: 2px solid #2dd4bf;
+        outline-offset: 2px;
+      }
+      .device-chips {
+        display: flex;
+        gap: 0.4rem;
+        flex-wrap: wrap;
+      }
+      .device-chips button {
+        padding: 0.35rem 0.65rem;
+        border: 1px solid #475569;
+        border-radius: 999px;
+        background: transparent;
+        color: #cbd5e1;
+        cursor: pointer;
+        font-size: 0.72rem;
+        white-space: nowrap;
+      }
+      .device-chips button:hover {
+        border-color: #64748b;
+        color: #f8fafc;
+      }
+      .device-chips button.active {
+        border-color: #2dd4bf;
+        color: #2dd4bf;
+        background: rgba(45, 212, 191, 0.1);
+      }
+      .device-meta {
+        color: #64748b;
+        font-size: 0.75rem;
+        text-align: center;
+      }
+      .device-meta strong {
+        color: #94a3b8;
+        font-weight: 600;
+      }
+      .phone-wrap {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        flex: 1;
+        min-height: 0;
+        padding: 0.5rem 0;
+      }
+      .phone {
+        position: relative;
+        border-radius: 2.5rem;
+        padding: 12px;
+        background: #0f172a;
+        box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.5);
+        transition: width 0.25s ease, height 0.25s ease;
+      }
+      .phone--notch::before {
+        content: "";
+        position: absolute;
+        top: 8px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 120px;
+        height: 28px;
+        background: #0f172a;
+        border-radius: 0 0 1rem 1rem;
+        z-index: 2;
+        pointer-events: none;
+      }
+      .phone--classic {
+        border-radius: 1.75rem;
+        padding: 10px;
+      }
+      .phone--classic::after {
+        content: "";
+        position: absolute;
+        bottom: 6px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 48px;
+        height: 4px;
+        background: #334155;
+        border-radius: 999px;
+        z-index: 2;
+        pointer-events: none;
+      }
+      .screen {
+        width: 100%;
+        height: 100%;
+        border: none;
+        border-radius: 2rem;
+        background: #fff;
+        display: block;
+      }
+      .phone--classic .screen {
+        border-radius: 1.35rem;
+      }
+      .note {
+        color: #94a3b8;
+        font-size: 0.8rem;
+        text-align: center;
+        max-width: 24rem;
+        line-height: 1.5;
+        margin: 0 auto;
+      }
+      .note a {
+        color: #2dd4bf;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>スマホプレビュー</h1>
+
+    <div class="panel">
+      <p class="label">ページ</p>
+      <div class="toolbar" id="pages">
+        <button type="button" class="active" data-path="/">トップページ</button>
+        <button type="button" data-path="/reserve">予約</button>
+        <button type="button" class="admin" data-path="/admin">医師用</button>
+      </div>
+
+      <p class="label">端末（画面サイズ）</p>
+      <div class="device-controls">
+        <select class="device-select" id="device-select" aria-label="端末を選択"></select>
+        <div class="device-chips" id="device-chips"></div>
+      </div>
+      <p class="device-meta" id="device-meta"></p>
+    </div>
+
+    <div class="phone-wrap">
+      <div class="phone phone--notch" id="phone" style="width: 390px; height: 844px">
+        <iframe
+          class="screen"
+          id="preview"
+          src="http://localhost:3000/"
+          title="スマホプレビュー"
+        ></iframe>
+      </div>
+    </div>
+
+    <p class="note">
+      実機で確認する場合は、同じ Wi‑Fi で
+      <a href="http://10.68.115.205:3000/">http://10.68.115.205:3000/</a>
+      をスマホのブラウザで開いてください。
+    </p>
+
+    <script>
+      const DEVICES = [
+        { id: "iphone-se-1", name: "iPhone SE（第1世代）", w: 320, h: 568, notch: false, chip: true },
+        { id: "iphone-se-23", name: "iPhone SE（第2・3世代）", w: 375, h: 667, notch: false, chip: true },
+        { id: "iphone-12-mini", name: "iPhone 12 mini", w: 375, h: 812, notch: true, chip: false },
+        { id: "iphone-13-14", name: "iPhone 13 / 14", w: 390, h: 844, notch: true, chip: true },
+        { id: "iphone-14-plus", name: "iPhone 14 Plus", w: 428, h: 926, notch: true, chip: false },
+        { id: "iphone-14-pro-max", name: "iPhone 14 Pro Max", w: 430, h: 932, notch: true, chip: false },
+        { id: "iphone-15-pro", name: "iPhone 15 Pro", w: 393, h: 852, notch: true, chip: false },
+        { id: "pixel-7", name: "Google Pixel 7", w: 412, h: 915, notch: true, chip: false },
+        { id: "galaxy-s23", name: "Galaxy S23", w: 360, h: 780, notch: true, chip: true },
+        { id: "android-mid", name: "Android（中）", w: 360, h: 800, notch: true, chip: true },
+        { id: "android-small", name: "Android（小）", w: 360, h: 640, notch: false, chip: false },
+      ];
+
+      const STORAGE_KEY = "asano-mobile-preview-device";
+      const DEFAULT_DEVICE_ID = "iphone-13-14";
+
+      const base = "http://localhost:3000";
+      const iframe = document.getElementById("preview");
+      const phone = document.getElementById("phone");
+      const select = document.getElementById("device-select");
+      const chips = document.getElementById("device-chips");
+      const meta = document.getElementById("device-meta");
+
+      let currentDevice = null;
+
+      function getDevice(id) {
+        return DEVICES.find((d) => d.id === id) || DEVICES.find((d) => d.id === DEFAULT_DEVICE_ID);
+      }
+
+      function applyDevice(device) {
+        currentDevice = device;
+        const maxH = window.innerHeight - 280;
+        const scale = device.h > maxH ? maxH / device.h : 1;
+        const w = Math.round(device.w * scale);
+        const h = Math.round(device.h * scale);
+
+        phone.style.width = w + "px";
+        phone.style.height = h + "px";
+        phone.classList.toggle("phone--notch", device.notch);
+        phone.classList.toggle("phone--classic", !device.notch);
+
+        meta.innerHTML =
+          "<strong>" +
+          device.name +
+          "</strong>　表示: " +
+          w +
+          " × " +
+          h +
+          " px" +
+          (scale < 1 ? "（画面に合わせて縮小）" : "") +
+          "　実寸: " +
+          device.w +
+          " × " +
+          device.h;
+
+        select.value = device.id;
+        chips.querySelectorAll("button").forEach((btn) => {
+          btn.classList.toggle("active", btn.dataset.id === device.id);
+        });
+
+        try {
+          localStorage.setItem(STORAGE_KEY, device.id);
+        } catch (_) {}
+      }
+
+      function setDeviceById(id) {
+        applyDevice(getDevice(id));
+      }
+
+      DEVICES.forEach((d) => {
+        const opt = document.createElement("option");
+        opt.value = d.id;
+        opt.textContent = d.name + "（" + d.w + "×" + d.h + "）";
+        select.appendChild(opt);
+      });
+
+      DEVICES.filter((d) => d.chip).forEach((d) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.dataset.id = d.id;
+        btn.textContent = d.name.replace(/（.+）$/, "").replace("iPhone SE（第2・3世代）", "SE 2/3");
+        btn.addEventListener("click", () => setDeviceById(d.id));
+        chips.appendChild(btn);
+      });
+
+      select.addEventListener("change", () => setDeviceById(select.value));
+
+      document.querySelectorAll("#pages button").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll("#pages button").forEach((b) => b.classList.remove("active"));
+          btn.classList.add("active");
+          iframe.src = base + btn.dataset.path;
+        });
+      });
+
+      window.addEventListener("resize", () => {
+        if (currentDevice) applyDevice(currentDevice);
+      });
+
+      let saved = null;
+      try {
+        saved = localStorage.getItem(STORAGE_KEY);
+      } catch (_) {}
+      setDeviceById(saved && getDevice(saved) ? saved : DEFAULT_DEVICE_ID);
+    </script>
+  </body>
+</html>

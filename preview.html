@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>あさの歯科ホームページ — プレビュー</title>
+    <style>
+      body {
+        font-family: system-ui, -apple-system, sans-serif;
+        max-width: 32rem;
+        margin: 4rem auto;
+        padding: 0 1.5rem;
+        line-height: 1.6;
+        color: #1a1a1a;
+      }
+      a.preview-link {
+        display: inline-block;
+        margin: 1rem 0;
+        padding: 0.75rem 1.25rem;
+        background: #0d9488;
+        color: #fff;
+        text-decoration: none;
+        border-radius: 0.5rem;
+        font-weight: 600;
+      }
+      a.preview-link:hover {
+        background: #0f766e;
+      }
+      a.preview-link.admin {
+        background: #1e40af;
+      }
+      a.preview-link.admin:hover {
+        background: #1e3a8a;
+      }
+      .links {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: flex-start;
+      }
+      code {
+        background: #f4f4f5;
+        padding: 0.15rem 0.4rem;
+        border-radius: 0.25rem;
+        font-size: 0.9em;
+      }
+      .note {
+        font-size: 0.9rem;
+        color: #52525b;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>あさの歯科ホームページ</h1>
+    <p>開発サーバー起動後、下のボタンから各画面を開けます。</p>
+    <div class="links">
+      <a class="preview-link" href="http://localhost:3000/" target="_blank" rel="noopener">
+        トップページ（患者向け）
+      </a>
+      <a class="preview-link admin" href="http://localhost:3000/admin" target="_blank" rel="noopener">
+        医師用 — 予約確認・管理
+      </a>
+    </div>
+    <p class="note">
+      医師用画面の初期パスワード: <code>asano-admin</code>（本番は <code>ADMIN_PASSWORD</code> を設定）
+    </p>
+    <p class="note">
+      ページが表示されない場合は、プロジェクトフォルダで
+      <code>npm run dev</code> を実行してから、もう一度リンクを開いてください。
+    </p>
+  </body>
+</html>
