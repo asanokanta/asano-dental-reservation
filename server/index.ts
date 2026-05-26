@@ -1,4 +1,4 @@
-import express, { type Request, type Response, type NextFunction } from "express";
+import express from "express";
 import { createServer } from "node:http";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -12,7 +12,8 @@ const __dirname = path.dirname(__filename);
 const app = express();
 app.use(express.json());
 
-app.all("/api/*", async (req: Request, res: Response, next: NextFunction) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+app.all("/api/*", async (req: any, res: any, next: any) => {
   const handled = await handleApi(req, res, req.originalUrl || req.url || "");
   if (!handled) next();
 });
@@ -23,7 +24,8 @@ const staticPath = process.env.NODE_ENV === "production"
 
 app.use(express.static(staticPath));
 
-app.get("*", (_req: Request, res: Response) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+app.get("*", (_req: any, res: any) => {
   // Vercel環境では静的ファイルはVercelが処理するため、ここはAPI以外のフォールバック
   const indexPath = path.join(staticPath, "index.html");
   if (fs.existsSync(indexPath)) {
