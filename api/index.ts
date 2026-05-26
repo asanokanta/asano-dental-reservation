@@ -1,6 +1,6 @@
 import express from "express";
 import { createClient } from "@supabase/supabase-js";
-import { getAvailableDates } from "../shared/booking.js";
+import { getAvailableDates } from "../shared/booking";
 
 const app = express();
 app.use(express.json());
