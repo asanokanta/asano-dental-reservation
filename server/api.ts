@@ -126,22 +126,21 @@ export async function handleApi(
 
     if (!result.ok && result.error === "already_booked") {
       const status = getHttpStatus("CONFLICT");
-      sendJson(res, status, createErrorResponse(
-        `${result.existing?.date} ${result.existing?.time}に予約があります。変更はお電話ください。`,
-        "CONFLICT"
-      ));
+      sendJson(res, status, {
+        ok: false,
+        error: "already_booked",
+        code: "CONFLICT",
+        message: `${result.existing?.date} ${result.existing?.time}に予約があります。変更はお電話ください。`,
+      });
       return true;
     }
-
     if (!result.ok) {
       sendJson(res, 400, createErrorResponse(result.error, "VALIDATION_ERROR"));
       return true;
     }
-
     sendJson(res, 200, createSuccessResponse(result.reservation));
     return true;
   }
-
   // --- 医院向け管理 ---
   if (method === "GET" && urlPath === "/api/admin/patients") {
     if (!requireAdmin(req, res)) return true;
@@ -234,18 +233,19 @@ export async function handleApi(
 
     if (!result.ok && result.error === "already_booked") {
       const status = getHttpStatus("CONFLICT");
-      sendJson(res, status, createErrorResponse(
-        `診察師番号 ${result.existing?.membershipId} は既に予約済みです。`,
-        "CONFLICT"
-      ));
+      sendJson(res, status, {
+        ok: false,
+        error: "already_booked",
+        code: "CONFLICT",
+        message: `診察券番号 ${result.existing?.membershipId} は既に予約済みです。`,
+        existing: result.existing ?? null,
+      });
       return true;
     }
-
     if (!result.ok) {
       sendJson(res, 400, createErrorResponse(result.error, "VALIDATION_ERROR"));
       return true;
     }
-
     sendJson(res, 200, createSuccessResponse(result.reservation));
     return true;
   }

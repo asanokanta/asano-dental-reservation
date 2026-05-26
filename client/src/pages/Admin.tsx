@@ -103,7 +103,7 @@ export default function Admin() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [lastReservationCount]);
 
   useEffect(() => {
     if (token) {
@@ -195,7 +195,7 @@ export default function Admin() {
       alert("サーバーから不正な応答がありました。");
       return;
     }
-    if (res.ok) {
+    if (res.ok || data.ok) {
       setShowAddReservation(false);
       setResDate("");
       setResTimes([]);
@@ -204,13 +204,19 @@ export default function Admin() {
       setResComment("");
       setIsForceBooking(false);
       fetchData();
-    } else if (data.error === "already_booked") {
+    } else if (data.error === "already_booked" || data.code === "CONFLICT") {
       const existing = data.existing;
-      if (confirm(`この患者様はすでに予約があります：\n${formatDateJa(existing.date)} ${formatTimeRange(existing.time, existing.endTime)}\n\n現在の予約をキャンセルして、新しい日時に置き換えますか？`)) {
-        handleAddReservation(null, true);
+      if (existing) {
+        if (confirm(`この患者様はすでに予約があります：\n${formatDateJa(existing.date)} ${formatTimeRange(existing.time, existing.endTime)}\n\n現在の予約をキャンセルして、新しい日時に置き換えますか？`)) {
+          handleAddReservation(null, true);
+        }
+      } else {
+        if (confirm(`この患者様はすでに予約があります。\n\n現在の予約をキャンセルして、新しい日時に置き換えますか？`)) {
+          handleAddReservation(null, true);
+        }
       }
     } else {
-      alert(data.error || "予約に失敗しました");
+      alert(data.error || data.message || "予約に失敗しました");
     }
   };
 
@@ -243,16 +249,24 @@ export default function Admin() {
 
   const handleAddPatient = async (e: FormEvent) => {
     e.preventDefault();
-    const res = await fetch("/api/admin/patients", {
-      method: "POST",
-      headers: { ...authHeaders(), "Content-Type": "application/json" },
-      body: JSON.stringify({ id: newId, name: newName, status: newStatus }),
-    });
-    if (res.ok) {
-      setNewId("");
-      setNewName("");
-      setNewStatus("normal");
-      fetchData();
+    try {
+      const res = await fetch("/api/admin/patients", {
+        method: "POST",
+        headers: { ...authHeaders(), "Content-Type": "application/json" },
+        body: JSON.stringify({ id: newId, name: newName, status: newStatus }),
+      });
+      const data = await res.json();
+      if (res.ok && (data.ok !== false)) {
+        setNewId("");
+        setNewName("");
+        setNewStatus("normal");
+        fetchData();
+      } else {
+        alert(data.error || "患者の登録に失敗しました。もう一度お試しください。");
+      }
+    } catch (err) {
+      console.error("handleAddPatient error:", err);
+      alert("通信エラーが発生しました。ネットワークを確認してもう一度お試しください。");
     }
   };
 
@@ -269,24 +283,42 @@ export default function Admin() {
   };
 
   const handleToggleArrivalStatus = async (id: string, currentStatus: boolean) => {
-    await fetch(`/api/admin/reservations/${id}`, {
-      method: "PATCH",
-      headers: { ...authHeaders(), "Content-Type": "application/json" },
-      body: JSON.stringify({ arrived: !currentStatus }),
-    });
-    fetchData();
+    try {
+      const res = await fetch(`/api/admin/reservations/${id}`, {
+        method: "PATCH",
+        headers: { ...authHeaders(), "Content-Type": "application/json" },
+        body: JSON.stringify({ arrived: !currentStatus }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        alert(data.error || "来院ステータスの更新に失敗しました。");
+        return;
+      }
+      fetchData();
+    } catch (err) {
+      console.error("handleToggleArrivalStatus error:", err);
+      alert("通信エラーが発生しました。ネットワークを確認してもう一度お試しください。");
+    }
   };
-
   const handleUpdateComment = async (id: string, currentComment: string) => {
     const newComment = prompt("コメントを入力してください", currentComment);
     if (newComment === null) return;
-    
-    await fetch(`/api/admin/reservations/${id}`, {
-      method: "PATCH",
-      headers: { ...authHeaders(), "Content-Type": "application/json" },
-      body: JSON.stringify({ comment: newComment }),
-    });
-    fetchData();
+    try {
+      const res = await fetch(`/api/admin/reservations/${id}`, {
+        method: "PATCH",
+        headers: { ...authHeaders(), "Content-Type": "application/json" },
+        body: JSON.stringify({ comment: newComment }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        alert(data.error || "コメントの更新に失敗しました。");
+        return;
+      }
+      fetchData();
+    } catch (err) {
+      console.error("handleUpdateComment error:", err);
+      alert("通信エラーが発生しました。ネットワークを確認してもう一度お試しください。");
+    }
   };
 
   // 週間カレンダー用：日付ごとに予約を時系列でグループ化
