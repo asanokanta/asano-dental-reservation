@@ -16,7 +16,7 @@ import {
   listPatients,
   upsertPatient,
   validateMembershipNumber,
-} from "./patientCsv";
+} from "./patientSupabase";
 
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD ?? "asano-admin";
 
@@ -71,7 +71,8 @@ export async function handleApi(
   // --- 患者向け予約 ---
   if (method === "POST" && urlPath === "/api/reserve/validate") {
     const body = await readJsonBody<{ membershipNumber?: string }>(req);
-    sendJson(res, 200, validateMembershipNumber(body.membershipNumber));
+    const result = await validateMembershipNumber(body.membershipNumber);
+    sendJson(res, 200, result);
     return true;
   }
 
@@ -109,7 +110,7 @@ export async function handleApi(
       return true;
     }
 
-    const check = validateMembershipNumber(body.membershipId);
+    const check = await validateMembershipNumber(body.membershipId);
     if (!check.ok) {
       sendJson(res, 403, createErrorResponse(check.error, "AUTHORIZATION_ERROR"));
       return true;
@@ -143,7 +144,13 @@ export async function handleApi(
   // --- 医院向け管理 ---
   if (method === "GET" && urlPath === "/api/admin/patients") {
     if (!requireAdmin(req, res)) return true;
-    sendJson(res, 200, { patients: listPatients() });
+    try {
+      const patients = await listPatients();
+      sendJson(res, 200, { patients });
+    } catch (e) {
+      console.error("Error listing patients:", e);
+      sendJson(res, 500, { error: "患者一覧の取得に失敗しました" });
+    }
     return true;
   }
 
@@ -165,16 +172,26 @@ export async function handleApi(
       name,
       status: body.status === "blocked" ? "blocked" : "normal",
     };
-    upsertPatient(record);
-    sendJson(res, 200, { ok: true, patient: record });
+    try {
+      await upsertPatient(record);
+      sendJson(res, 200, { ok: true, patient: record });
+    } catch (e) {
+      console.error("Error upserting patient:", e);
+      sendJson(res, 500, { error: "患者の追加に失敗しました" });
+    }
     return true;
   }
 
   if (method === "DELETE" && urlPath.startsWith("/api/admin/patients/")) {
     if (!requireAdmin(req, res)) return true;
     const id = urlPath.replace("/api/admin/patients/", "").split("?")[0].trim();
-    const ok = deletePatient(id);
-    sendJson(res, ok ? 200 : 404, { ok });
+    try {
+      const ok = await deletePatient(id);
+      sendJson(res, ok ? 200 : 404, { ok });
+    } catch (e) {
+      console.error("Error deleting patient:", e);
+      sendJson(res, 500, { error: "患者の削除に失敗しました" });
+    }
     return true;
   }
 
