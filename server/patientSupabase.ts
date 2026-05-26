@@ -42,7 +42,7 @@ async function loadPatients(): Promise<PatientRecord[]> {
   }));
   cacheTime = now;
 
-  return cachedPatients;
+  return cachedPatients!;
 }
 
 /**
