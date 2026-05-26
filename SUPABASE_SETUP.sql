@@ -62,3 +62,8 @@ CREATE POLICY "Allow update for patients" ON patients
 
 CREATE POLICY "Allow delete for patients" ON patients
   FOR DELETE USING (true);
+
+-- anon / authenticated ロールへのテーブルアクセス権を付与
+-- （RLSポリシーだけでなくGRANTも必要）
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.reservations TO anon, authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.patients TO anon, authenticated;
