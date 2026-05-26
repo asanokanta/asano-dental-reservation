@@ -17,6 +17,7 @@ import {
   upsertPatient,
   validateMembershipNumber,
 } from "./patientSupabase";
+import { getDiagnostics } from "./diagnostics";
 
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD ?? "asano-admin";
 
@@ -270,6 +271,18 @@ export async function handleApi(
     }
     
     sendJson(res, ok ? 200 : 404, { ok });
+    return true;
+  }
+
+  // --- 診断用エンドポイント（デバッグ用） ---
+  if (method === "GET" && urlPath === "/api/diagnostics") {
+    try {
+      const diag = await getDiagnostics();
+      sendJson(res, 200, diag);
+    } catch (e) {
+      console.error("Diagnostics error:", e);
+      sendJson(res, 500, { error: String(e) });
+    }
     return true;
   }
 
