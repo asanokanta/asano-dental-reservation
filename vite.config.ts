@@ -248,6 +248,8 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, "dist"),
     emptyOutDir: true,
+    target: ["es2015", "safari14"],
+    cssTarget: ["safari14"],
   },
   server: {
     port: 3000,
