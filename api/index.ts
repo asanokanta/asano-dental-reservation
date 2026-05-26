@@ -12,7 +12,7 @@ import {
   validate,
   webReservationSchema,
   adminReservationSchema,
-} from "./lib";
+} from "./lib.js";
 
 // ---- Types ----
 type PatientStatus = "normal" | "blocked";
