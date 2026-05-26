@@ -1,8 +1,8 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
-import { getAvailableDates } from "../shared/booking.js";
-import type { PatientRecord } from "../shared/reserve.js";
-import { validate, webReservationSchema, adminReservationSchema } from "../shared/validation.js";
-import { createErrorResponse, createSuccessResponse, getHttpStatus } from "../shared/apiResponse.js";
+import { getAvailableDates } from "../shared/booking";
+import type { PatientRecord } from "../shared/reserve";
+import { validate, webReservationSchema, adminReservationSchema } from "../shared/validation";
+import { createErrorResponse, createSuccessResponse, getHttpStatus } from "../shared/apiResponse";
 import {
   cancelReservation,
   createReservation,
@@ -10,13 +10,13 @@ import {
   getSlotsForDate,
   updateReservationArrivalStatus,
   updateReservation,
-} from "./bookingStore.js";
+} from "./bookingStore";
 import {
   deletePatient,
   listPatients,
   upsertPatient,
   validateMembershipNumber,
-} from "./patientCsv.js";
+} from "./patientCsv";
 
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD ?? "asano-admin";
 

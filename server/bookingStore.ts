@@ -6,7 +6,7 @@ import {
   SLOT_MINUTES,
   type Reservation,
   type TimeSlot,
-} from "../shared/booking.js";
+} from "../shared/booking";
 import { createClient } from "@supabase/supabase-js";
 
 // Supabaseクライアントの初期化

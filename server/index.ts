@@ -3,8 +3,8 @@ import { createServer } from "node:http";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import fs from "node:fs";
-import { handleApi } from "./api.js";
-import { startCleanupScheduler } from "./cleanupScheduler.js";
+import { handleApi } from "./api";
+import { startCleanupScheduler } from "./cleanupScheduler";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
