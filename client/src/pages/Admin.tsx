@@ -10,13 +10,40 @@ import { Search, Plus, Calendar, User, Trash2, Bell, X, Phone, CheckCircle2, Cir
 
 const TOKEN_KEY = "asano_admin_token";
 
+// ブラウザのストレージが使えない環境（iPhoneのプライベートモードなど）への対策
+function safeGetItem(key: string): string | null {
+  try {
+    return sessionStorage.getItem(key) || localStorage.getItem(key);
+  } catch (e) {
+    return null;
+  }
+}
+
+function safeSetItem(key: string, value: string) {
+  try {
+    sessionStorage.setItem(key, value);
+    localStorage.setItem(key, value);
+  } catch (e) {
+    // ストレージが使えない場合は何もしない（メモリ内の状態のみで動作）
+  }
+}
+
+function safeRemoveItem(key: string) {
+  try {
+    sessionStorage.removeItem(key);
+    localStorage.removeItem(key);
+  } catch (e) {
+    // ignore
+  }
+}
+
 function authHeaders(): HeadersInit {
-  const token = sessionStorage.getItem(TOKEN_KEY);
+  const token = safeGetItem(TOKEN_KEY);
   return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
 export default function Admin() {
-  const [token, setToken] = useState<string | null>(() => sessionStorage.getItem(TOKEN_KEY));
+  const [token, setToken] = useState<string | null>(() => safeGetItem(TOKEN_KEY));
   const [password, setPassword] = useState("");
   const [loginError, setLoginError] = useState("");
 
@@ -52,7 +79,7 @@ export default function Admin() {
         fetch("/api/admin/reservations", { headers: authHeaders() }),
       ]);
       if (pRes.status === 401 || rRes.status === 401) {
-        sessionStorage.removeItem(TOKEN_KEY);
+        safeRemoveItem(TOKEN_KEY);
         setToken(null);
         return;
       }
@@ -60,8 +87,8 @@ export default function Admin() {
       const rData = await rRes.json();
       const newReservations = rData.reservations ?? [];
       
-      // 通知チェック
-      if (lastReservationCount > 0 && newReservations.length > lastReservationCount) {
+      // 通知チェック (モバイル環境などNotificationがない場合のチェックを追加)
+      if (typeof window !== 'undefined' && 'Notification' in window && lastReservationCount > 0 && newReservations.length > lastReservationCount) {
         const latest = newReservations[newReservations.length - 1];
         if (Notification.permission === "granted") {
           new Notification("新しい予約が入りました", {
@@ -87,7 +114,7 @@ export default function Admin() {
   }, [token, fetchData]);
 
   useEffect(() => {
-    if (token && Notification.permission === "default") {
+    if (typeof window !== 'undefined' && 'Notification' in window && token && Notification.permission === "default") {
       Notification.requestPermission();
     }
   }, [token]);
@@ -190,22 +217,26 @@ export default function Admin() {
   const handleLogin = async (e: FormEvent) => {
     e.preventDefault();
     setLoginError("");
-    sessionStorage.setItem(TOKEN_KEY, password);
+    safeSetItem(TOKEN_KEY, password);
     setToken(password);
-    const res = await fetch("/api/admin/patients", {
-      headers: { Authorization: `Bearer ${password}` },
-    });
-    if (res.status === 401) {
-      sessionStorage.removeItem(TOKEN_KEY);
-      setToken(null);
-      setLoginError("パスワードが正しくありません");
-      return;
+    try {
+      const res = await fetch("/api/admin/patients", {
+        headers: { Authorization: `Bearer ${password}` },
+      });
+      if (res.status === 401) {
+        safeRemoveItem(TOKEN_KEY);
+        setToken(null);
+        setLoginError("パスワードが正しくありません");
+        return;
+      }
+      fetchData();
+    } catch (e) {
+      setLoginError("ログイン中にエラーが発生しました。");
     }
-    fetchData();
   };
 
   const handleLogout = () => {
-    sessionStorage.removeItem(TOKEN_KEY);
+    safeRemoveItem(TOKEN_KEY);
     setToken(null);
     setPassword("");
   };
