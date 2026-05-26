@@ -1,15 +1,17 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import type { PatientRecord, ReserveValidationResult } from "../shared/reserve";
 
-// Supabaseクライアントの初期化
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_ANON_KEY;
-
-if (!supabaseUrl || !supabaseKey) {
-  throw new Error("SUPABASE_URL and SUPABASE_ANON_KEY environment variables are required");
+// 遅延初期化
+let _supabase: SupabaseClient | null = null;
+function getSupabase(): SupabaseClient {
+  if (!_supabase) {
+    const url = process.env.SUPABASE_URL;
+    const key = process.env.SUPABASE_ANON_KEY;
+    if (!url || !key) throw new Error("SUPABASE_URL and SUPABASE_ANON_KEY are required");
+    _supabase = createClient(url, key);
+  }
+  return _supabase;
 }
-
-const supabase = createClient(supabaseUrl, supabaseKey);
 
 // キャッシュ（短時間のみ保持）
 let cachedPatients: PatientRecord[] | null = null;
@@ -25,7 +27,7 @@ async function loadPatients(): Promise<PatientRecord[]> {
     return cachedPatients;
   }
 
-  const { data, error } = await supabase
+  const { data, error } = await getSupabase()
     .from("patients")
     .select("*")
     .order("id", { ascending: true });
@@ -49,7 +51,7 @@ async function loadPatients(): Promise<PatientRecord[]> {
  * 患者を追加または更新
  */
 export async function upsertPatient(patient: PatientRecord): Promise<void> {
-  const { error } = await supabase.from("patients").upsert({
+  const { error } = await getSupabase().from("patients").upsert({
     id: patient.id,
     name: patient.name,
     status: patient.status,
@@ -67,7 +69,7 @@ export async function upsertPatient(patient: PatientRecord): Promise<void> {
  * 患者を削除
  */
 export async function deletePatient(id: string): Promise<boolean> {
-  const { error } = await supabase.from("patients").delete().eq("id", id);
+  const { error } = await getSupabase().from("patients").delete().eq("id", id);
 
   if (error) {
     console.error("Error deleting patient:", error);

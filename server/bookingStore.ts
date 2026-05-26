@@ -7,23 +7,25 @@ import {
   type Reservation,
   type TimeSlot,
 } from "../shared/booking";
-import { createClient } from "@supabase/supabase-js";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
-// Supabaseクライアントの初期化
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_ANON_KEY;
-
-if (!supabaseUrl || !supabaseKey) {
-  throw new Error("SUPABASE_URL and SUPABASE_ANON_KEY environment variables are required");
+// 遅延初期化（Vercelのランタイムで環境変数が確実に読み込まれてから使用）
+let _supabase: SupabaseClient | null = null;
+function getSupabase(): SupabaseClient {
+  if (!_supabase) {
+    const url = process.env.SUPABASE_URL;
+    const key = process.env.SUPABASE_ANON_KEY;
+    if (!url || !key) throw new Error("SUPABASE_URL and SUPABASE_ANON_KEY are required");
+    _supabase = createClient(url, key);
+  }
+  return _supabase;
 }
-
-const supabase = createClient(supabaseUrl, supabaseKey);
 
 /**
  * Supabaseから予約データを取得
  */
 async function readReservations(): Promise<Reservation[]> {
-  const { data, error } = await supabase
+  const { data, error } = await getSupabase()
     .from("reservations")
     .select("*")
     .order("date", { ascending: true })
@@ -52,7 +54,7 @@ async function readReservations(): Promise<Reservation[]> {
  * Supabaseに予約データを保存
  */
 async function writeReservation(reservation: Reservation): Promise<void> {
-  const { error } = await supabase.from("reservations").upsert({
+  const { error } = await getSupabase().from("reservations").upsert({
     id: reservation.id,
     membership_id: reservation.membershipId,
     patient_name: reservation.patientName,
@@ -74,7 +76,7 @@ async function writeReservation(reservation: Reservation): Promise<void> {
  * Supabaseから予約を削除
  */
 async function deleteReservation(id: string): Promise<void> {
-  const { error } = await supabase.from("reservations").delete().eq("id", id);
+  const { error } = await getSupabase().from("reservations").delete().eq("id", id);
 
   if (error) {
     throw new Error(`Failed to delete reservation: ${error.message}`);
@@ -89,7 +91,7 @@ async function cleanupOldReservations(): Promise<void> {
   today.setHours(0, 0, 0, 0);
   const todayStr = today.toISOString().slice(0, 10);
 
-  const { error } = await supabase
+  const { error } = await getSupabase()
     .from("reservations")
     .delete()
     .lt("date", todayStr);
