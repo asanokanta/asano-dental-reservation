@@ -12,6 +12,6 @@ jobs:
       - name: 前日リマインド送信 & アーカイブ処理
         run: |
           curl -s -X POST \
-            "https://asano-dental-reservation-beryl.vercel.app/api/line-reminder" \
+            "https://asano-dental.pages.dev/api/line-reminder" \
             -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
             -w "\nHTTP Status: %{http_code}\n"
