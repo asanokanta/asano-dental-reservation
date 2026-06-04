@@ -1,0 +1,17 @@
+name: Daily Reminder & Supabase Keep-alive
+
+on:
+  schedule:
+    - cron: '0 23 * * *'   # 毎日 8:00 AM JST（UTC 23:00）
+  workflow_dispatch:         # 手動実行ボタンも表示
+
+jobs:
+  trigger:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 前日リマインド送信 & アーカイブ処理
+        run: |
+          curl -s -X POST \
+            "https://asano-dental-reservation-beryl.vercel.app/api/line-reminder" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            -w "\nHTTP Status: %{http_code}\n"
