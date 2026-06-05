@@ -113,7 +113,7 @@ export default function HoursSection() {
               <div className="px-4 py-3 border-b border-cream-muted bg-brand/5">
                 <p className="text-sm font-bold text-warm">曜日別 診療の目安</p>
                 <p className="text-xs text-warm-muted mt-0.5">
-                  ○ 診療　△ 土曜午前のみ　○※ 木曜（受付時間に注意）　× 休診
+                  ○ 診療（空）　△ 土曜午前のみ（普）　○※ 木曜（混）　× 休診（満）
                 </p>
               </div>
               <div className="overflow-x-auto">
