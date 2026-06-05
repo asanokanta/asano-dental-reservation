@@ -1,0 +1,22 @@
+name: Supabase Keep-alive
+
+on:
+  schedule:
+    - cron: '0 12 * * *'   # 毎日 21:00 JST（UTC 12:00）
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Supabaseに直接アクセスして停止を防ぐ
+        run: |
+          RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" \
+            "https://kobxfrddqzizclvbtdtb.supabase.co/rest/v1/reservations?limit=1" \
+            -H "apikey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtvYnhmcmRkcXppemNsdmJ0ZHRiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3NTU2OTcsImV4cCI6MjA5NTMzMTY5N30.rcJwoR1jJcMjz1ZbjM3L1jxgCSeDIG4rykKpOXwm3bk")
+          echo "Supabase response: $RESPONSE"
+          if [ "$RESPONSE" != "200" ]; then
+            echo "⚠️ Supabase応答異常: $RESPONSE"
+            exit 1
+          fi
+          echo "✅ Supabase正常動作確認"
