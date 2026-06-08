@@ -40,20 +40,20 @@ function StepProgressBar({ step }: { step: AuthStep }) {
             <div
               className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-colors ${
                 i < current
-                  ? "bg-[#66BB6A] text-white"
+                  ? "bg-brand text-white"
                   : i === current
-                    ? "bg-[#66BB6A] text-white ring-4 ring-[#E8F5E9]"
-                    : "bg-[#EDE4C8] text-[#8A8575]"
+                    ? "bg-brand text-white ring-4 ring-accent-light"
+                    : "bg-cream-muted text-warm-muted"
               }`}
             >
               {i + 1}
             </div>
-            <span className={`text-[10px] font-bold whitespace-nowrap ${i === current ? "text-[#66BB6A]" : "text-[#8A8575]"}`}>
+            <span className={`text-[10px] font-bold whitespace-nowrap ${i === current ? "text-brand" : "text-warm-muted"}`}>
               {p.label}
             </span>
           </div>
           {i < PROGRESS_STEPS.length - 1 && (
-            <div className={`h-0.5 flex-1 mx-1 mb-4 ${i < current ? "bg-[#66BB6A]" : "bg-[#EDE4C8]"}`} />
+            <div className={`h-0.5 flex-1 mx-1 mb-4 ${i < current ? "bg-brand" : "bg-cream-muted"}`} />
           )}
         </div>
       ))}
@@ -233,24 +233,24 @@ export default function LiffReserve() {
 
   /** 空き状況レベル → カレンダーに表示する記号・色・タップ可否 */
   const AVAILABILITY_SYMBOL: Record<DateAvailability | "unknown", { mark: string; color: string; clickable: boolean }> = {
-    available: { mark: "○", color: "text-[#2E7D32]", clickable: true },
+    available: { mark: "○", color: "text-brand", clickable: true },
     low: { mark: "⚠", color: "text-amber-500", clickable: true },
-    full: { mark: "×", color: "text-[#BDBDBD]", clickable: false },
-    closed: { mark: "休", color: "text-[#9E9E9E]", clickable: false },
-    unknown: { mark: "×", color: "text-[#E0E0E0]", clickable: false },
+    full: { mark: "×", color: "text-slate-300", clickable: false },
+    closed: { mark: "休", color: "text-slate-400", clickable: false },
+    unknown: { mark: "×", color: "text-slate-200", clickable: false },
   };
 
   // ---- UI ----
-  const base = "min-h-screen bg-[#FEF9E7] flex flex-col items-center px-4 py-8";
-  const card = "w-full max-w-sm bg-white rounded-2xl shadow-sm border border-[#EDE4C8] p-6";
+  const base = "min-h-screen bg-cream flex flex-col items-center px-4 py-8";
+  const card = "w-full max-w-sm bg-card rounded-2xl shadow-sm border border-cream-muted p-6";
   const btn = "w-full py-4 rounded-xl font-bold text-white text-lg transition-colors";
-  const green = "bg-[#66BB6A] hover:bg-[#4CAF50]";
-  const gray = "bg-slate-300 text-slate-500";
-  const input = "w-full border-2 border-[#EDE4C8] rounded-xl px-4 py-3 text-lg font-bold focus:border-[#66BB6A] outline-none";
+  const green = "bg-brand hover:bg-brand-dark";
+  const gray = "bg-cream-muted text-warm-muted";
+  const input = "w-full border-2 border-cream-muted rounded-xl px-4 py-3 text-lg font-bold focus:border-brand outline-none";
 
   if (step === "loading") return (
-    <div className="min-h-screen bg-[#FEF9E7] flex items-center justify-center">
-      <div className="animate-spin rounded-full h-10 w-10 border-4 border-[#66BB6A] border-t-transparent" />
+    <div className="min-h-screen bg-cream flex items-center justify-center">
+      <div className="animate-spin rounded-full h-10 w-10 border-4 border-brand border-t-transparent" />
     </div>
   );
 
@@ -264,8 +264,8 @@ export default function LiffReserve() {
     <div className={base}>
       {/* ヘッダー */}
       <div className="w-full max-w-sm mb-4 text-center">
-        <p className="text-[#66BB6A] text-xs font-bold tracking-widest uppercase mb-1">Asano Dental Clinic</p>
-        <h1 className="text-2xl font-bold text-[#5C5748]" style={{ fontFamily: "'Zen Maru Gothic', sans-serif" }}>
+        <p className="text-brand text-xs font-bold tracking-widest uppercase mb-1">Asano Dental Clinic</p>
+        <h1 className="text-2xl font-bold text-warm" style={{ fontFamily: "'Zen Maru Gothic', sans-serif" }}>
           🦷 ネット予約
         </h1>
       </div>
@@ -274,12 +274,12 @@ export default function LiffReserve() {
 
       {/* 選択中のメニュー（メニュー選択・完了画面以外で表示） */}
       {selectedMenu && step !== "menu" && step !== "done" && (
-        <div className="w-full max-w-sm mb-3 flex items-center justify-between gap-3 bg-white border border-[#EDE4C8] rounded-xl px-4 py-2.5">
-          <p className="text-xs text-[#5C5748]">
-            <span className="text-[#8A8575]">ご来院理由：</span>
+        <div className="w-full max-w-sm mb-3 flex items-center justify-between gap-3 bg-card border border-cream-muted rounded-xl px-4 py-2.5">
+          <p className="text-xs text-warm">
+            <span className="text-warm-muted">ご来院理由：</span>
             <span className="font-bold">{selectedMenu.label}</span>
           </p>
-          <button className="text-[10px] text-[#66BB6A] font-bold underline shrink-0" onClick={() => setStep("menu")}>
+          <button className="text-[10px] text-brand font-bold underline shrink-0" onClick={() => setStep("menu")}>
             変更する
           </button>
         </div>
@@ -288,18 +288,18 @@ export default function LiffReserve() {
       {/* メニュー（来院理由）選択 */}
       {step === "menu" && (
         <div className={card + " space-y-3"}>
-          <p className="text-sm text-[#8A8575]">本日のご来院理由を選んでください。</p>
+          <p className="text-sm text-warm-muted">本日のご来院理由を選んでください。</p>
           <div className="space-y-2">
             {RESERVE_MENU_ITEMS.map((item) => (
               <button key={item.id} type="button"
                 onClick={() => { setSelectedMenu(item); setStep("name"); }}
-                className="w-full flex items-center justify-between gap-3 text-left bg-white border-2 border-[#EDE4C8] hover:border-[#66BB6A] rounded-xl px-4 py-3 transition-colors"
+                className="w-full flex items-center justify-between gap-3 text-left bg-card border-2 border-cream-muted hover:border-brand rounded-xl px-4 py-3 transition-colors"
               >
                 <span>
-                  <span className="block font-bold text-[#5C5748]">{item.label}</span>
-                  <span className="block text-xs text-[#8A8575] mt-0.5">{item.description}</span>
+                  <span className="block font-bold text-warm">{item.label}</span>
+                  <span className="block text-xs text-warm-muted mt-0.5">{item.description}</span>
                 </span>
-                <span className="text-[#66BB6A] text-xl shrink-0">›</span>
+                <span className="text-brand text-xl shrink-0">›</span>
               </button>
             ))}
           </div>
@@ -309,10 +309,10 @@ export default function LiffReserve() {
       {/* 名前入力 */}
       {step === "name" && (
         <div className={card + " space-y-4"}>
-          <div className="bg-[#FFF8E1] border border-[#FFD54F] rounded-xl p-3 text-xs text-[#5C5748] font-medium">
+          <div className="bg-accent-light border border-accent rounded-xl p-3 text-xs text-warm font-medium">
             再診（診察券をお持ち）の方のみご利用いただけます。
           </div>
-          <p className="text-sm text-[#8A8575]">カルテに登録されているお名前（漢字）を入力してください。</p>
+          <p className="text-sm text-warm-muted">カルテに登録されているお名前（漢字）を入力してください。</p>
           {nameError && <p className="text-red-600 text-sm font-bold">{nameError}</p>}
           <input className={input} placeholder="山田太郎" value={nameInput}
             onChange={e => { setNameInput(e.target.value); setNameError(""); }} />
@@ -338,7 +338,7 @@ export default function LiffReserve() {
             onClick={handleCardSubmit} disabled={cardInput.length !== 4 || loading}>
             {loading ? "確認中…" : "決定する"}
           </button>
-          <button className="w-full text-[#66BB6A] text-sm font-bold" onClick={() => { setStep("name"); setCardInput(""); }}>
+          <button className="w-full text-brand text-sm font-bold" onClick={() => { setStep("name"); setCardInput(""); }}>
             ← 名前入力に戻る
           </button>
         </div>
@@ -347,18 +347,18 @@ export default function LiffReserve() {
       {/* カレンダー */}
       {step === "calendar" && (
         <div className={card + " space-y-4"}>
-          <p className="text-sm text-[#8A8575]"><span className="font-bold text-[#5C5748]">{patient?.name}</span> 様</p>
+          <p className="text-sm text-warm-muted"><span className="font-bold text-warm">{patient?.name}</span> 様</p>
           {/* 月ナビ */}
           <div className="flex items-center justify-between">
-            <button className="text-[#66BB6A] font-bold px-3 py-1" onClick={() => {
+            <button className="text-brand font-bold px-3 py-1" onClick={() => {
               const [y, m] = calendarMonth.split("-").map(Number);
               const prev = new Date(y, m - 2, 1);
               setCalendarMonth(`${prev.getFullYear()}-${String(prev.getMonth()+1).padStart(2,"0")}`);
             }}>←</button>
-            <p className="font-bold text-[#5C5748]">
+            <p className="font-bold text-warm">
               {calendarMonth.split("-").map(Number).join("年")}月
             </p>
-            <button className="text-[#66BB6A] font-bold px-3 py-1" onClick={() => {
+            <button className="text-brand font-bold px-3 py-1" onClick={() => {
               const [y, m] = calendarMonth.split("-").map(Number);
               const next = new Date(y, m, 1);
               setCalendarMonth(`${next.getFullYear()}-${String(next.getMonth()+1).padStart(2,"0")}`);
@@ -367,7 +367,7 @@ export default function LiffReserve() {
           {/* 曜日ヘッダー */}
           <div className="grid grid-cols-7 text-center text-xs font-bold">
             {["日","月","火","水","木","金","土"].map((d,i) => (
-              <div key={d} className={i===0?"text-red-400":i===6?"text-blue-400":"text-[#8A8575]"}>{d}</div>
+              <div key={d} className={i===0?"text-red-400":i===6?"text-blue-400":"text-warm-muted"}>{d}</div>
             ))}
           </div>
           {/* 日付グリッド */}
@@ -382,21 +382,21 @@ export default function LiffReserve() {
                   onClick={() => clickable && handleDateSelect(iso)}
                   disabled={!clickable}
                   className={`flex flex-col items-center justify-center gap-0.5 rounded-lg py-2 border transition-colors ${
-                    clickable ? "bg-[#E8F5E9] border-[#A5D6A7] hover:border-[#66BB6A]" : "border-transparent"
+                    clickable ? "bg-accent-light border-brand/30 hover:border-brand" : "border-transparent"
                   }`}
                 >
-                  <span className={`text-sm font-bold ${clickable ? "text-[#2E7D32]" : "text-[#BDBDBD]"}`}>{dayNum}</span>
+                  <span className={`text-sm font-bold ${clickable ? "text-warm" : "text-slate-300"}`}>{dayNum}</span>
                   <span className={`text-xs leading-none ${color}`}>{mark}</span>
                 </button>
               );
             })}
           </div>
           {/* 空き状況の凡例 */}
-          <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-[11px] text-[#8A8575] pt-2 border-t border-[#EDE4C8]">
-            <span><span className="text-[#2E7D32] font-bold">○</span> 余裕あり</span>
+          <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-[11px] text-warm-muted pt-2 border-t border-cream-muted">
+            <span><span className="text-brand font-bold">○</span> 余裕あり</span>
             <span><span className="text-amber-500 font-bold">⚠</span> 残り少し</span>
-            <span><span className="text-[#9E9E9E] font-bold">×</span> 空きなし</span>
-            <span><span className="text-[#9E9E9E] font-bold">休</span> 休診日</span>
+            <span><span className="text-slate-400 font-bold">×</span> 空きなし</span>
+            <span><span className="text-slate-400 font-bold">休</span> 休診日</span>
           </div>
         </div>
       )}
@@ -404,19 +404,19 @@ export default function LiffReserve() {
       {/* 時間選択 */}
       {step === "time" && (
         <div className={card + " space-y-4"}>
-          <button className="text-[#66BB6A] text-sm font-bold" onClick={() => setStep("calendar")}>← 日付を変える</button>
-          <p className="font-bold text-[#5C5748]">{fmtDateJa(selectedDate)}</p>
-          <p className="text-sm text-[#8A8575]">時間を選んでください。</p>
+          <button className="text-brand text-sm font-bold" onClick={() => setStep("calendar")}>← 日付を変える</button>
+          <p className="font-bold text-warm">{fmtDateJa(selectedDate)}</p>
+          <p className="text-sm text-warm-muted">時間を選んでください。</p>
           {bookError && <p className="text-red-600 text-sm font-bold">{bookError}</p>}
-          {loading ? <p className="text-center text-[#8A8575] py-4">読み込み中…</p> : (
+          {loading ? <p className="text-center text-warm-muted py-4">読み込み中…</p> : (
             <div className="grid grid-cols-2 gap-2">
               {slots.filter(s => s.available).map(s => (
                 <button key={s.time}
                   onClick={() => { setSelectedTime(s.time); setStep("confirm"); }}
                   className={`py-3 rounded-xl font-bold border-2 text-sm transition-colors ${
                     selectedTime === s.time
-                      ? "border-[#66BB6A] bg-[#66BB6A] text-white"
-                      : "border-[#EDE4C8] bg-white text-[#5C5748] hover:border-[#66BB6A]"
+                      ? "border-brand bg-brand text-white"
+                      : "border-cream-muted bg-card text-warm hover:border-brand"
                   }`}
                 >
                   {formatTimeRange(s.time)}
@@ -430,26 +430,26 @@ export default function LiffReserve() {
       {/* 確認画面 */}
       {step === "confirm" && patient && (
         <div className={card + " space-y-5"}>
-          <p className="text-center text-[#8A8575] text-sm">この内容でよろしいですか？</p>
-          <div className="bg-[#F1F8E9] rounded-xl p-5 space-y-2 border border-[#C5E1A5]">
+          <p className="text-center text-warm-muted text-sm">この内容でよろしいですか？</p>
+          <div className="bg-accent-light rounded-xl p-5 space-y-2 border border-accent">
             {selectedMenu && (
               <>
-                <p className="text-sm text-[#8A8575]">📝 ご来院理由</p>
-                <p className="font-bold text-[#5C5748]">{selectedMenu.label}</p>
+                <p className="text-sm text-warm-muted">📝 ご来院理由</p>
+                <p className="font-bold text-warm">{selectedMenu.label}</p>
               </>
             )}
-            <p className="text-sm text-[#8A8575] mt-2">👤 お名前</p>
-            <p className="font-bold text-[#5C5748] text-lg">{patient.name}様</p>
-            <p className="text-sm text-[#8A8575] mt-2">📅 日付</p>
-            <p className="font-bold text-[#5C5748]">{fmtDateJa(selectedDate)}</p>
-            <p className="text-sm text-[#8A8575] mt-2">⏰ 時間</p>
-            <p className="font-bold text-[#66BB6A] text-lg">{fmtSlot(selectedTime)}</p>
+            <p className="text-sm text-warm-muted mt-2">👤 お名前</p>
+            <p className="font-bold text-warm text-lg">{patient.name}様</p>
+            <p className="text-sm text-warm-muted mt-2">📅 日付</p>
+            <p className="font-bold text-warm">{fmtDateJa(selectedDate)}</p>
+            <p className="text-sm text-warm-muted mt-2">⏰ 時間</p>
+            <p className="font-bold text-brand text-lg">{fmtSlot(selectedTime)}</p>
           </div>
           {bookError && <p className="text-red-600 text-sm font-bold text-center">{bookError}</p>}
           <button className={`${btn} ${!loading ? green : gray}`} onClick={handleBook} disabled={loading}>
             {loading ? "予約中…" : "はい、予約する"}
           </button>
-          <button className="w-full text-[#66BB6A] text-sm font-bold" onClick={() => { setStep("time"); setBookError(""); }}>
+          <button className="w-full text-brand text-sm font-bold" onClick={() => { setStep("time"); setBookError(""); }}>
             ← 時間を変える
           </button>
         </div>
@@ -459,14 +459,14 @@ export default function LiffReserve() {
       {step === "done" && patient && (
         <div className={card + " text-center space-y-4"}>
           <p className="text-4xl">✅</p>
-          <p className="text-xl font-bold text-[#5C5748]">予約が完了しました</p>
-          <div className="bg-[#F1F8E9] rounded-xl p-4 text-left space-y-1 border border-[#C5E1A5]">
-            {selectedMenu && <p className="text-sm font-bold text-[#5C5748]">📝 {selectedMenu.label}</p>}
-            <p className="text-sm font-bold text-[#5C5748]">👤 {patient.name}様</p>
-            <p className="text-sm font-bold text-[#5C5748]">📅 {fmtDateJa(selectedDate)}</p>
-            <p className="text-sm font-bold text-[#66BB6A]">⏰ {fmtSlot(selectedTime)}</p>
+          <p className="text-xl font-bold text-warm">予約が完了しました</p>
+          <div className="bg-accent-light rounded-xl p-4 text-left space-y-1 border border-accent">
+            {selectedMenu && <p className="text-sm font-bold text-warm">📝 {selectedMenu.label}</p>}
+            <p className="text-sm font-bold text-warm">👤 {patient.name}様</p>
+            <p className="text-sm font-bold text-warm">📅 {fmtDateJa(selectedDate)}</p>
+            <p className="text-sm font-bold text-brand">⏰ {fmtSlot(selectedTime)}</p>
           </div>
-          <p className="text-xs text-[#8A8575]">
+          <p className="text-xs text-warm-muted">
             キャンセル・変更はお電話でお願いします。<br />📞 {CLINIC_PHONE}
           </p>
           {/* LINEチャットで予約内容を確認するボタン（返信メッセージ=無料） */}
@@ -488,7 +488,7 @@ export default function LiffReserve() {
             💬 LINEで予約内容を確認する
           </button>
           <button
-            className="w-full py-3 rounded-xl text-sm text-[#8A8575] border border-[#EDE4C8]"
+            className="w-full py-3 rounded-xl text-sm text-warm-muted border border-cream-muted"
             onClick={() => liff.closeWindow()}
           >
             閉じる
