@@ -419,12 +419,15 @@ export default function Reserve() {
                     key={slot.time}
                     type="button"
                     onClick={() => setSelectedTime(slot.time)}
-                    className={`py-4 rounded-xl text-lg font-bold border-2 transition-colors ${
+                    className={`py-4 rounded-xl text-lg font-bold border-2 transition-colors relative ${
                       selectedTime === slot.time
                         ? "border-brand bg-brand text-white"
                         : "border-cream-muted bg-card hover:border-brand"
                     }`}
                   >
+                    {slot.available && (
+                      <span className="absolute top-1 right-2 text-brand/30 text-sm">+</span>
+                    )}
                     {formatTimeRange(slot.time)}
                   </button>
                 ))}

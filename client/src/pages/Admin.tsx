@@ -460,21 +460,20 @@ export default function Admin() {
                               <div className="flex items-center justify-between gap-3 mb-2">
                                 <p className="text-base font-black text-brand leading-none">{formatTimeRange(reservation.time, reservation.endTime)}</p>
                                 <div className="flex items-center gap-2">
-                                  {reservation.arrived && (
-                                    <span className="text-[10px] font-bold text-emerald-600">来院済み</span>
-                                  )}
+
                                   <button
                                     type="button"
                                     onClick={() => handleToggleArrivalStatus(reservation.id, reservation.arrived ?? false)}
-                                    className={`w-6 h-6 rounded flex items-center justify-center transition-all ${
+                                    className={`h-6 px-2 rounded flex items-center gap-1 transition-all ${
                                       reservation.arrived
                                         ? "bg-emerald-500 text-white shadow-sm"
                                         : "bg-slate-200 text-slate-400 hover:bg-slate-300"
                                     }`}
                                     title={reservation.arrived ? "来院済み" : "未来院"}
                                   >
-                                    <CheckCircle2 className={`w-4 h-4 ${reservation.arrived ? "block" : "hidden"}`} />
-                                    {!reservation.arrived && <div className="w-3 h-3 border-2 border-slate-300 rounded-sm" />}
+                                    <CheckCircle2 className={`w-3.5 h-3.5 ${reservation.arrived ? "block" : "hidden"}`} />
+                                    {!reservation.arrived && <div className="w-2.5 h-2.5 border-2 border-slate-300 rounded-sm" />}
+                                    <span className="text-[10px] font-bold">{reservation.arrived ? "来院済み" : "未来院"}</span>
                                   </button>
                                   <button
                                     type="button"
@@ -603,21 +602,20 @@ export default function Admin() {
                       <div className="flex items-center gap-4">
                         {/* 来院ステータスチェックボックス */}
                         <div className="flex items-center gap-2">
-                          {r.arrived && (
-                            <span className="text-sm font-bold text-emerald-600">来院済み</span>
-                          )}
+
                           <button
                             type="button"
                             onClick={() => handleToggleArrivalStatus(r.id, r.arrived ?? false)}
-                            className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all ${
+                            className={`h-8 px-3 rounded-lg flex items-center gap-1.5 transition-all ${
                               r.arrived
                                 ? "bg-emerald-500 text-white shadow-md shadow-emerald-100"
                                 : "bg-slate-200 text-slate-400 hover:bg-slate-300"
                             }`}
                             title={r.arrived ? "来院済み" : "未来院"}
                           >
-                            <CheckCircle2 className={`w-5 h-5 ${r.arrived ? "block" : "hidden"}`} />
-                            {!r.arrived && <div className="w-4 h-4 border-2 border-slate-300 rounded" />}
+                            <CheckCircle2 className={`w-4 h-4 ${r.arrived ? "block" : "hidden"}`} />
+                            {!r.arrived && <div className="w-3.5 h-3.5 border-2 border-slate-300 rounded" />}
+                            <span className="text-xs font-bold">{r.arrived ? "来院済み" : "未来院"}</span>
                           </button>
                         </div>
                         {/* コメント編集ボタン */}
@@ -846,26 +844,28 @@ export default function Admin() {
                         <button
                           key={slot.time}
                           type="button"
-                          disabled={!slot.available}
-                          onClick={() => {
-                            setResTimes(prev => {
-                              if (prev.includes(slot.time)) {
-                                return prev.filter(t => t !== slot.time);
-                              } else {
-                                return [...prev, slot.time].sort();
-                              }
-                            });
-                          }}
-                          className={`py-2 rounded-lg text-[10px] font-bold border transition-all ${
-                            !slot.available 
-                              ? "bg-slate-50 text-slate-300 border-slate-100 line-through" 
-                              : resTimes.includes(slot.time)
-                                ? "bg-brand text-white border-brand shadow-md"
-                                : "bg-white text-slate-600 border-slate-200 hover:border-brand"
-                          }`}
-                        >
-                          {formatTimeRange(slot.time)}
-                        </button>
+	                          onClick={() => {
+	                            setResTimes(prev => {
+	                              if (prev.includes(slot.time)) {
+	                                return prev.filter(t => t !== slot.time);
+	                              } else {
+	                                return [...prev, slot.time].sort();
+	                              }
+	                            });
+	                          }}
+	                          className={`py-2 rounded-lg text-[10px] font-bold border transition-all relative ${
+	                            resTimes.includes(slot.time)
+	                              ? "bg-brand text-white border-brand shadow-md"
+	                              : !slot.available
+	                                ? "bg-amber-50 text-amber-700 border-amber-200 hover:border-brand"
+	                                : "bg-white text-slate-600 border-slate-200 hover:border-brand"
+	                          }`}
+	                        >
+	                          {!resTimes.includes(slot.time) && (
+	                            <span className={`absolute top-0.5 right-1 text-[10px] ${!slot.available ? "text-amber-400" : "text-brand/30"}`}>+</span>
+	                          )}
+	                          {formatTimeRange(slot.time)}
+	                        </button>
                     ))
                   )}
                 </div>
