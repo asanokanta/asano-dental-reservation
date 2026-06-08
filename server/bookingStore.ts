@@ -1,9 +1,14 @@
 import { randomUUID } from "node:crypto";
 import {
+  BOOKING_DAYS_AHEAD_ADMIN,
+  BOOKING_DAYS_AHEAD_PATIENT,
   generateSlotsForSession,
   getSessionsForDate,
+  isBookableDate,
+  LOW_AVAILABILITY_THRESHOLD,
   MAX_PATIENTS_PER_SLOT,
   SLOT_MINUTES,
+  type DateAvailability,
   type Reservation,
   type TimeSlot,
 } from "../shared/booking";
@@ -22,12 +27,13 @@ function getSupabase(): SupabaseClient {
 }
 
 /**
- * Supabaseから予約データを取得
+ * アクティブな予約（archived=false）を取得
  */
 async function readReservations(): Promise<Reservation[]> {
   const { data, error } = await getSupabase()
     .from("reservations")
     .select("*")
+    .eq("archived", false)
     .order("date", { ascending: true })
     .order("time", { ascending: true });
 
@@ -84,7 +90,7 @@ async function deleteReservation(id: string): Promise<void> {
 }
 
 /**
- * 前日以前の予約を自動削除
+ * 前日以前の予約をアーカイブ（削除せず保存）
  */
 async function cleanupOldReservations(): Promise<void> {
   const today = new Date();
@@ -93,12 +99,43 @@ async function cleanupOldReservations(): Promise<void> {
 
   const { error } = await getSupabase()
     .from("reservations")
-    .delete()
-    .lt("date", todayStr);
+    .update({ archived: true })
+    .lt("date", todayStr)
+    .eq("archived", false);
 
   if (error) {
-    console.error("Error cleaning up old reservations:", error);
+    console.error("Error archiving old reservations:", error);
   }
+}
+
+/**
+ * アクティブ＋アーカイブ済みの全予約を古い順で取得
+ */
+export async function getAllReservationsIncludingArchived(): Promise<(Reservation & { archived: boolean })[]> {
+  const { data, error } = await getSupabase()
+    .from("reservations")
+    .select("*")
+    .order("date", { ascending: true })
+    .order("time", { ascending: true });
+
+  if (error) {
+    console.error("Error reading all reservations:", error);
+    return [];
+  }
+
+  return (data || []).map((row: any) => ({
+    id: row.id,
+    membershipId: row.membership_id,
+    patientName: row.patient_name,
+    date: row.date,
+    time: row.time,
+    endTime: row.end_time,
+    comment: row.comment,
+    arrived: row.arrived,
+    createdAt: row.created_at,
+    source: row.source,
+    archived: row.archived ?? false,
+  }));
 }
 
 export async function getReservationsForDate(date: string): Promise<Reservation[]> {
@@ -156,6 +193,75 @@ export async function getSlotsForDate(date: string, isAdmin: boolean = false): P
   }
 
   return slots;
+}
+
+/**
+ * 月内の各日の空き状況レベル（カレンダー表示用）
+ * - closed: 休診日
+ * - full: 診療日だが空き枠なし
+ * - low: 残り枠が少ない（LOW_AVAILABILITY_THRESHOLD以下）
+ * - available: 余裕あり
+ * 患者の予約可能期間外の日付は結果に含めない（フロント側で「×」扱いにする）
+ */
+export async function getMonthAvailability(month: string): Promise<Record<string, DateAvailability>> {
+  const [y, mo] = month.split("-").map(Number);
+  if (!y || !mo) return {};
+  const daysInMonth = new Date(y, mo, 0).getDate();
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const earliest = new Date(today);
+  earliest.setDate(earliest.getDate() + 1); // 患者は翌日以降
+  const latest = new Date(today);
+  latest.setDate(latest.getDate() + BOOKING_DAYS_AHEAD_PATIENT);
+
+  await cleanupOldReservations();
+  const reservations = await readReservations();
+  const bookedCountByKey = new Map<string, number>();
+  for (const r of reservations) {
+    if (r.endTime) {
+      const [h1, m1] = r.time.split(":").map(Number);
+      const [h2, m2] = r.endTime.split(":").map(Number);
+      let mins = h1 * 60 + m1;
+      const end = h2 * 60 + m2;
+      while (mins < end) {
+        const time = `${String(Math.floor(mins / 60)).padStart(2, "0")}:${String(mins % 60).padStart(2, "0")}`;
+        const key = `${r.date}|${time}`;
+        bookedCountByKey.set(key, (bookedCountByKey.get(key) ?? 0) + 1);
+        mins += SLOT_MINUTES;
+      }
+    } else {
+      const key = `${r.date}|${r.time}`;
+      bookedCountByKey.set(key, (bookedCountByKey.get(key) ?? 0) + 1);
+    }
+  }
+
+  const result: Record<string, DateAvailability> = {};
+  for (let day = 1; day <= daysInMonth; day++) {
+    const iso = `${y}-${String(mo).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+    const dateObj = new Date(`${iso}T00:00:00`);
+    if (dateObj < earliest || dateObj > latest) continue;
+
+    if (!isBookableDate(iso)) {
+      result[iso] = "closed";
+      continue;
+    }
+
+    let total = 0;
+    let available = 0;
+    for (const session of getSessionsForDate(iso)) {
+      for (const time of generateSlotsForSession(iso, session)) {
+        total++;
+        if ((bookedCountByKey.get(`${iso}|${time}`) ?? 0) === 0) available++;
+      }
+    }
+
+    if (total === 0 || available === 0) result[iso] = "full";
+    else if (available <= LOW_AVAILABILITY_THRESHOLD) result[iso] = "low";
+    else result[iso] = "available";
+  }
+
+  return result;
 }
 
 export async function createReservation(input: {

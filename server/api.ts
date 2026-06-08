@@ -7,6 +7,8 @@ import {
   cancelReservation,
   createReservation,
   getAllReservations,
+  getAllReservationsIncludingArchived,
+  getMonthAvailability,
   getSlotsForDate,
   updateReservationArrivalStatus,
   updateReservation,
@@ -84,6 +86,18 @@ export async function handleApi(
     return true;
   }
 
+  if (method === "GET" && urlPath.startsWith("/api/reserve/availability")) {
+    const q = new URL(urlPath, "http://local").searchParams;
+    const month = q.get("month") ?? "";
+    if (!/^\d{4}-\d{2}$/.test(month)) {
+      sendJson(res, 400, { error: "month（YYYY-MM形式）が必要です" });
+      return true;
+    }
+    const availability = await getMonthAvailability(month);
+    sendJson(res, 200, { availability });
+    return true;
+  }
+
   if (method === "GET" && urlPath.startsWith("/api/reserve/slots")) {
     const q = new URL(urlPath, "http://local").searchParams;
     const date = q.get("date");
@@ -103,6 +117,7 @@ export async function handleApi(
       patientName?: string;
       date?: string;
       time?: string;
+      comment?: string;
     }>(req);
 
     const validation = validate(webReservationSchema, body);
@@ -122,6 +137,7 @@ export async function handleApi(
       patientName: check.patient.name,
       date: validation.data.date,
       time: validation.data.time,
+      comment: validation.data.comment,
     });
 
     if (!result.ok && result.error === "already_booked") {
@@ -198,6 +214,13 @@ export async function handleApi(
   if (method === "GET" && urlPath === "/api/admin/reservations") {
     if (!requireAdmin(req, res)) return true;
     const reservations = await getAllReservations();
+    sendJson(res, 200, { reservations });
+    return true;
+  }
+
+  if (method === "GET" && urlPath === "/api/admin/reservations/all") {
+    if (!requireAdmin(req, res)) return true;
+    const reservations = await getAllReservationsIncludingArchived();
     sendJson(res, 200, { reservations });
     return true;
   }

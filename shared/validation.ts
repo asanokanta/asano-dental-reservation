@@ -52,6 +52,7 @@ export const webReservationSchema = z.object({
   patientName: patientNameSchema.optional(),
   date: dateSchema,
   time: timeSchema,
+  comment: z.string().max(200).optional(),
 });
 
 /**

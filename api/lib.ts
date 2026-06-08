@@ -101,6 +101,7 @@ export const webReservationSchema = z.object({
   patientName: z.string().optional(),
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   time: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/),
+  comment: z.string().max(200).optional(),
 });
 export const adminReservationSchema = z.object({
   membershipId: z.string().min(1),

@@ -28,6 +28,7 @@ export type Reservation = {
   arrived?: boolean; // 来院済みフラグ
   comment?: string; // 予約コメント
   source?: 'web' | 'admin'; // 予約種別: 'web'=Web予約, 'admin'=電話・窓口予約
+  archived?: boolean; // 過去の予約フラグ
 };
 
 export type TimeSlot = {
@@ -36,9 +37,18 @@ export type TimeSlot = {
   available: boolean;
 };
 
+/** カレンダー1日分の空き状況レベル（○ 余裕あり / ⚠ 残り少し / × 空きなし / 休 休診日） */
+export type DateAvailability = "available" | "low" | "full" | "closed";
+
+/** この人数以下になったら「残り少し」表示にする */
+export const LOW_AVAILABILITY_THRESHOLD = 3;
+
 /** 予約種別の表示ラベル */
 export function getSourceLabel(source?: string): string {
-  return source === 'web' ? 'Web予約' : source === 'admin' ? '電話・窓口' : '不明';
+  return source === 'web' ? 'Web予約'
+    : source === 'admin' ? '電話・窓口'
+    : source === 'line' ? 'LINE予約'
+    : '不明';
 }
 
 export { getSessionsForDate, isRegularClosedDay };
@@ -107,10 +117,11 @@ export function formatDateJa(dateStr: string): string {
  */
 export function formatTimeRange(timeStr: string, endTimeStr?: string): string {
   if (!timeStr) return "";
+  const start = timeStr.slice(0, 5);
   if (endTimeStr) {
-    return `${timeStr}〜${endTimeStr}`;
+    return `${start}〜${endTimeStr.slice(0, 5)}`;
   }
-  const startMins = toMinutes(timeStr);
+  const startMins = toMinutes(start);
   const endMins = startMins + SLOT_MINUTES;
-  return `${timeStr}〜${fromMinutes(endMins)}`;
+  return `${start}〜${fromMinutes(endMins)}`;
 }
