@@ -313,7 +313,7 @@ export default function LiffReserve() {
             再診（診察券をお持ち）の方のみご利用いただけます。
           </div>
           <p className="text-sm text-warm-muted">カルテに登録されているお名前（漢字）を入力してください。</p>
-          {nameError && <p className="text-red-600 text-sm font-bold">{nameError}</p>}
+          {nameError && <div className="bg-red-50 border-2 border-red-300 text-red-700 rounded-xl p-3 text-sm font-bold whitespace-pre-line">{nameError}</div>}
           <input className={input} placeholder="山田太郎" value={nameInput}
             onChange={e => { setNameInput(e.target.value); setNameError(""); }} />
           <button className={`${btn} ${nameInput.trim() && !loading ? green : gray}`}
@@ -330,7 +330,7 @@ export default function LiffReserve() {
             <p className="text-sm font-bold text-yellow-800 mb-1">⚠️ 同姓同名のお名前が登録されています</p>
             <p className="text-xs text-yellow-700">4桁の診察券番号を入力してください。</p>
           </div>
-          {cardError && <p className="text-red-600 text-sm font-bold">{cardError}</p>}
+          {cardError && <div className="bg-red-50 border-2 border-red-300 text-red-700 rounded-xl p-3 text-sm font-bold">{cardError}</div>}
           <input className={`${input} text-center text-3xl tracking-widest`}
             placeholder="0000" maxLength={4} inputMode="numeric" value={cardInput}
             onChange={e => { setCardInput(e.target.value.replace(/\D/g,"").slice(0,4)); setCardError(""); }} />
@@ -407,7 +407,7 @@ export default function LiffReserve() {
           <button className="text-brand text-sm font-bold" onClick={() => setStep("calendar")}>← 日付を変える</button>
           <p className="font-bold text-warm">{fmtDateJa(selectedDate)}</p>
           <p className="text-sm text-warm-muted">時間を選んでください。</p>
-          {bookError && <p className="text-red-600 text-sm font-bold">{bookError}</p>}
+          {bookError && <div className="bg-red-50 border-2 border-red-300 text-red-700 rounded-xl p-3 text-sm font-bold">{bookError}</div>}
           {loading ? <p className="text-center text-warm-muted py-4">読み込み中…</p> : (
             <div className="grid grid-cols-2 gap-2">
               {slots.filter(s => s.available).map(s => (
@@ -445,7 +445,7 @@ export default function LiffReserve() {
             <p className="text-sm text-warm-muted mt-2">⏰ 時間</p>
             <p className="font-bold text-brand text-lg">{fmtSlot(selectedTime)}</p>
           </div>
-          {bookError && <p className="text-red-600 text-sm font-bold text-center">{bookError}</p>}
+          {bookError && <div className="bg-red-50 border-2 border-red-300 text-red-700 rounded-xl p-3 text-sm font-bold text-center">{bookError}</div>}
           <button className={`${btn} ${!loading ? green : gray}`} onClick={handleBook} disabled={loading}>
             {loading ? "予約中…" : "はい、予約する"}
           </button>
