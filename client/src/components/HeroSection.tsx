@@ -69,7 +69,7 @@ export default function HeroSection() {
         {/* CTA Buttons */}
         <div className="fade-in-up flex flex-col sm:flex-row gap-2.5 md:gap-3 mb-4 md:mb-6">
           <a
-            href="/reserve"
+            href="/booking"
             className="flex items-center justify-center gap-2 bg-brand hover:bg-brand-dark text-white font-bold px-5 py-3 md:px-6 md:py-3.5 rounded-xl md:rounded-2xl transition-all duration-200 btn-press shadow-lg shadow-brand/25 text-xs md:text-sm"
           >
             <Calendar className="w-4 h-4" />

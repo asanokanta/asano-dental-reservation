@@ -207,7 +207,7 @@ export default function HoursSection() {
                 </div>
               </div>
               <a
-                href="/reserve"
+                href="/booking"
                 className="w-full flex items-center justify-center gap-2 bg-brand hover:bg-brand-dark text-white font-bold py-3 rounded-xl transition-colors btn-press text-sm"
               >
                 <Calendar className="w-4 h-4" />

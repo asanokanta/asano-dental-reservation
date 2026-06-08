@@ -92,7 +92,7 @@ export default function Header() {
                 <span className="text-sm font-bold tracking-wide">03-3913-4618</span>
               </a>
               <a
-                href="/reserve"
+                href="/booking"
                 className="hidden sm:flex items-center gap-1.5 bg-brand hover:bg-brand-dark text-white text-sm font-bold px-4 py-2 rounded-full transition-all duration-200 btn-press shadow-sm"
               >
                 <Calendar className="w-4 h-4" />
@@ -111,44 +111,55 @@ export default function Header() {
           </div>
         </div>
 
-        {/* Mobile Menu */}
+      </header>
+
+      {/* Mobile Menu — full-bg overlay, content ends at 90vh */}
+      <div
+        className={`lg:hidden fixed inset-0 z-40 bg-cream transition-opacity duration-300 ${
+          menuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+        }`}
+        style={{ paddingTop: "var(--header-offset-mobile)" }}
+      >
+        {/* コンテンツ領域：90vh - ヘッダー高さ に収める */}
         <div
-          className={`lg:hidden overflow-hidden transition-all duration-300 ${
-            menuOpen ? "max-h-96 border-t border-cream-muted" : "max-h-0"
-          } bg-cream`}
+          className="flex flex-col px-5 overflow-hidden"
+          style={{ height: "calc(90vh - var(--header-offset-mobile))" }}
         >
-          <div className="px-3 py-1.5">
-            <nav className="flex flex-col">
-              {navItems.map((item) => (
-                <a
-                  key={item.href}
-                  href={item.href}
-                  onClick={(e) => { e.preventDefault(); handleNavClick(item.href); }}
-                  className="block px-2 py-1 text-warm hover:text-brand hover:bg-accent-light rounded-md transition-colors text-[13px] font-medium leading-tight"
-                >
-                  {item.label}
-                </a>
-              ))}
-            </nav>
-            <div className="mt-1 pt-1 border-t border-cream-muted flex flex-col gap-1">
+          {/* Nav links — 均等に伸縮 */}
+          <nav className="flex flex-col flex-1 justify-evenly py-2">
+            {navItems.map((item) => (
               <a
-                href="tel:03-3913-4618"
-                className="flex items-center gap-2 px-2 py-1 text-warm hover:text-brand rounded-md transition-colors text-[13px] leading-tight"
+                key={item.href}
+                href={item.href}
+                onClick={(e) => { e.preventDefault(); handleNavClick(item.href); }}
+                className="flex items-center px-3 py-0 text-[1.05rem] font-bold text-warm hover:text-brand hover:bg-accent-light rounded-xl transition-colors border-b border-cream-muted last:border-none min-h-[2.75rem]"
               >
-                <Phone className="w-3.5 h-3.5 text-brand shrink-0" />
-                <span className="font-bold">03-3913-4618</span>
+                {item.label}
               </a>
-              <a
-                href="/reserve"
-                className="flex items-center justify-center gap-1.5 bg-brand text-white py-2 rounded-lg font-bold text-[13px] leading-tight"
-              >
-                <Calendar className="w-4 h-4" />
-                24時間ネット予約
-              </a>
-            </div>
+            ))}
+          </nav>
+
+          {/* Bottom CTAs */}
+          <div className="flex flex-col gap-2.5 pb-4">
+            <a
+              href="tel:03-3913-4618"
+              className="flex items-center justify-center gap-2.5 py-3.5 bg-card border border-cream-muted rounded-2xl text-warm font-bold text-[1rem] hover:bg-accent-light transition-colors"
+              onClick={() => setMenuOpen(false)}
+            >
+              <Phone className="w-5 h-5 text-brand flex-shrink-0" />
+              03-3913-4618
+            </a>
+            <a
+              href="/booking"
+              className="flex items-center justify-center gap-2.5 py-3.5 bg-brand hover:bg-brand-dark text-white rounded-2xl font-bold text-[1rem] transition-colors shadow-lg shadow-brand/25"
+              onClick={() => setMenuOpen(false)}
+            >
+              <Calendar className="w-5 h-5 flex-shrink-0" />
+              24時間ネット予約
+            </a>
           </div>
         </div>
-      </header>
+      </div>
     </>
   );
 }

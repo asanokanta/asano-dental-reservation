@@ -39,7 +39,7 @@ export default function MobileFixedBar() {
               <span className="text-[10px] text-warm-muted/80">03-3913-4618</span>
             </a>
             <a
-              href="/reserve"
+              href="/booking"
               className="flex-1 flex flex-col items-center justify-center gap-0.5 py-2.5 bg-brand hover:bg-brand-dark active:bg-brand-dark transition-colors"
             >
               <Calendar className="w-5 h-5 text-white" />

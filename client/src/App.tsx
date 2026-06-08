@@ -7,12 +7,22 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
 import Reserve from "./pages/Reserve";
 import Admin from "./pages/Admin";
+import Booking from "./pages/Booking";
+import LiffReserve from "./pages/LiffReserve";
+import Faq from "./pages/Faq";
+import LiffCheck from "./pages/LiffCheck";
+import Privacy from "./pages/Privacy";
 
 
 function Router() {
   return (
     <Switch>
       <Route path={"/"} component={Home} />
+      <Route path={"/booking"} component={Booking} />
+      <Route path={"/liff-reserve"} component={LiffReserve} />
+      <Route path={"/liff-check"} component={LiffCheck} />
+      <Route path={"/privacy"} component={Privacy} />
+      <Route path={"/faq"} component={Faq} />
       <Route path={"/reserve"} component={Reserve} />
       <Route path={"/admin"} component={Admin} />
       <Route path={"/404"} component={NotFound} />
